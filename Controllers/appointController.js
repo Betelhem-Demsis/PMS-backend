@@ -2,15 +2,25 @@ const catchAsync=require("../utils/catchasync");
 const Appointment=require("../Models/appointmentModel")
 const Doctor=require("../Models/doctorModel");
 const Patient = require("../Models/patientModel");
+const Feature=require("../utils/features")
 
 exports.getAllAppointments=catchAsync(async(req,res,next)=>{
-    const Appointment=await Appointment.find();
+
+    let filter={};
+    
+    if(req.params.status && req.params.status!=="all"){
+        filter={status :req.params.status} 
+    }
+
+    const features=new Feature(Appointment.find(),req.query).filter().sort().search().limit().paginate()
+
+    const appointments=await features.query();
     
     res.status(200).json({
         status:"success",
-        results:Appointment.length,
+        results:appointments.length,
         data:{
-            Appointment
+            appointments
         }
     })
 })
