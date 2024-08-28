@@ -62,7 +62,10 @@ const patientSchema = new mongoose.Schema({
       required: true 
     },
   },
-  currentAppointments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Appointment" }],
+  currentAppointments: [{
+     type: mongoose.Schema.Types.ObjectId,
+      ref: "Appointment" 
+    }],
   createdAt: {
      type: Date, 
      default: Date.now
