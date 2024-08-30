@@ -9,7 +9,6 @@ const ObjectId = mongoose.Types.ObjectId;
 
 exports.getAllPatients = catchAsync(async (req, res, next) => {
     let filter = {};
-    
     if (req.query.id) {
         if (ObjectId.isValid(req.query.id)) {
             filter._id = req.query.id;
@@ -18,25 +17,10 @@ exports.getAllPatients = catchAsync(async (req, res, next) => {
         }
     }
 
-    if (req.query.name && req.query.name !== "all") {
-        filter.$or = [
-            { firstName: req.query.name }
-        ];
-    }
-    else{
-        return next(new AppError('Invalid name format', 400));
-    }
-    if (req.query.currentAppointments && req.query.currentAppointments !== "all") {
-        filter.currentAppointments = req.query.currentAppointments;
-    }
-    else{
-        filter.currentAppointments = { $ne: [] };
-    }
-
     const features = new APIFeatures(Patient.find(filter), req.query)
         .filter()
         .sort()
-        .search()
+        .search() 
         .limit()
         .paginate();
 
@@ -51,11 +35,23 @@ exports.getAllPatients = catchAsync(async (req, res, next) => {
     });
 });
 
+
 exports.getPatient = catchAsync(async (req, res, next) => {
-    const patient = await Patient.findById(req.params.id);
+    let patient;
+
+    if (ObjectId.isValid(req.params.id)) {
+        patient = await Patient.findById(req.params.id);
+    } else {
+        patient = await Patient.findOne({ 
+            $or: [
+                { firstName: req.params.id },
+                { lastName: req.params.id }
+            ]
+        });
+    }
 
     if (!patient) {
-        return next(new AppError('No patient found with that ID', 404));
+        return next(new AppError('No patient found with that ID or name', 404));
     }
 
     res.status(200).json({

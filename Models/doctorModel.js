@@ -1,13 +1,13 @@
 const mongoose=require("mongoose")
-const Patient=require("./patientModel")
 
 const doctorSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     specialization: { type: String, required: true },
+    email: { type: String, required: true },
     contactInfo: {
         phone: { type: String, required: true },
-        email: { type: String, required: true },
+        address:{ type: String }
     },
     qualifications: [{ type: String }],
     yearsOfExperience: { type: Number },

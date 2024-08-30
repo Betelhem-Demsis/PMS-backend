@@ -4,36 +4,61 @@ const Doctor=require("../Models/doctorModel");
 const Patient = require("../Models/patientModel");
 const Feature=require("../utils/features")
 
-exports.getAllAppointments=catchAsync(async(req,res,next)=>{
+exports.getAllAppointments = catchAsync(async (req, res, next) => {
+    let filter = {};
 
-    let filter={};
-    
-    if(req.params.status && req.params.status!=="all"){
-        filter={status :req.params.status} 
+    if (req.query.status && req.query.status !== "all") {
+        filter.status = req.query.status;
     }
 
-    const features=new Feature(Appointment.find(),req.query).filter().sort().search().limit().paginate()
+    const features = new Feature(Appointment.find(filter), req.query)
+        .filter()
+        .sort()
+        .search()
+        .limit()
+        .paginate();
 
-    const appointments=await features.query();
-    
+    const appointments = await features.query;
+
     res.status(200).json({
-        status:"success",
-        results:appointments.length,
-        data:{
+        status: "success",
+        results: appointments.length,
+        data: {
             appointments
         }
-    })
-})
+    });
+});
 
-exports.getAppointment=catchAsync(async(req,res,next)=>{
-    const Appointment=await Appointment.findById(req.params.id);
+
+exports.getAppointment = catchAsync(async (req, res, next) => {
+    const appointment = await Appointment.findById(req.params.id); 
+    if (!appointment) {
+        return next(new AppError('No appointment found with that ID', 404));
+    }
     res.status(200).json({
-        status:"success",
-        data:{
-            Appointment
+        status: "success",
+        data: {
+            appointment
         }
-    })
-})
+    });
+});
+
+exports.updateAppointment = catchAsync(async (req, res, next) => {
+    const appointment = await Appointment.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    }); 
+    if (!appointment) {
+        return next(new AppError('No appointment found with that ID', 404));
+    }
+    res.status(200).json({
+        status: "success",
+        data: {
+            appointment
+        }
+    });
+});
+
 
 exports.createAppointment=catchAsync(async(req,res)=>{
     const newAppointment=await Appointment.create(req.body);
@@ -56,15 +81,6 @@ exports.createAppointment=catchAsync(async(req,res)=>{
     })
 })
 
-exports.updateAppointment=catchAsync(async(req,res)=>{
-    const Appointment=await findByIdAndUpdate(req.params.id,req.body);
-    res.status(200).json({
-        status:"success",
-        data:{
-            Appointment
-        }
-    })
-})
 
 exports.deleteAppointment=catchAsync(async(req,res)=>{
     await Appointment.findByIdAndDelete(req.params.id);

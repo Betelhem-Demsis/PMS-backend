@@ -17,13 +17,13 @@ const patientSchema = new mongoose.Schema({
      enum: ["Male", "Female"], 
      required: [true, "Gender is required"]
      },
+  email: { 
+      type: String
+     },
   contactInfo: {
     phone: { 
       type: String, 
       required: [true, "Phone number is required"]
-     },
-    email: { 
-      type: String
      },
     address: { 
       type: String

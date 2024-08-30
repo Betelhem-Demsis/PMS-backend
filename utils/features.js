@@ -38,10 +38,10 @@ class APIFeatures {
                           },
                       },
                       {
-                          currentAppointments: {
-                              $regex: this.queryString.keyword,
-                              $options: 'i', 
-                          },
+                        lastName:{
+                          $regex: this.queryString.keyword,
+                              $options: 'i',
+                        }
                       },
                       {
                           status: {
